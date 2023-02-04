@@ -41,10 +41,7 @@ let follow = async incoming =>
             object: incoming->StringOption.wrap,
           },
         )
-        if (
-          res.ok &&
-          await actor->StringOption.fromString->GitHub.insertToFile("/followers")
-        ) {
+        if res.ok && await actor->StringOption.fromString->GitHub.insertToFile("/followers") {
           {statusCode: 200}
         } else {
           {statusCode: 500, body: "Can't post Accept activity or can't update DB"}
