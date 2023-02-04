@@ -7,7 +7,7 @@ var ActorJson = require("../../../actor.json");
 
 var baseURL = Belt_Option.getExn(Js_dict.get(process.env, "AP_BASE_URL"));
 
-var privateKey = Belt_Option.getExn(Js_dict.get(process.env, "AP_PRIVATE_KEY"));
+var privateKey = Belt_Option.getExn(Js_dict.get(process.env, "AP_PRIVATE_KEY")).replace(/\\n/g, "\n");
 
 var ghToken = Belt_Option.getExn(Js_dict.get(process.env, "AP_GH_TOKEN"));
 
