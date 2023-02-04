@@ -1,0 +1,16 @@
+{
+  "name": "lesspub",
+  "version": "0.1.0",
+  "scripts": {
+    "res:build": "rescript",
+    "res:clean": "rescript clean",
+    "res:dev": "rescript build -w",
+    "res:fmt": "rescript format -all"
+  },
+  "author": "sinofp",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "node-fetch": "^3.3.0",
+    "rescript": "^10.1.2"
+  }
+}

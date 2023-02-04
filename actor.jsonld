@@ -1,0 +1,30 @@
+{
+    "@context": [
+        "https://www.w3.org/ns/activitystreams",
+        "https://w3id.org/security/v1"
+    ],
+    "id": "https://<YOUR_HOST>/actor",
+    "type": "Person",
+    "followers": "https://<YOUR_HOST>/followers",
+    "name": "<YOUR_DISPLAY_NAME>",
+    "summary": "<YOUR_BIO>",
+    "discoverable": true,
+    "published": "<PICK_A_DATE_YOU_LIKE>",
+    "inbox": "https://<YOUR_HOST>/inbox",
+    "outbox": "https://<YOUR_HOST>/outbox",
+    "publicKey": {
+        "id": "https://<YOUR_HOST>/actor#main-key",
+        "owner": "https://<YOUR_HOST>/actor",
+        "publicKeyPem": "<YOUR_PUBLIC_KEY>"
+    },
+    "icon": {
+        "type": "Image",
+        "mediaType": "image/jpeg",
+        "url": "<YOUR_AVATAR_URL>"
+    },
+    "image": {
+        "type": "Image",
+        "mediaType": "image/png",
+        "url": "<YOUR_HEADER_URL>"
+    }
+}

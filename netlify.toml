@@ -1,0 +1,47 @@
+[[redirects]]
+from = "/actor"
+to = "/.netlify/functions/lesspub/actor"
+
+[[redirects]]
+from = "/inbox"
+to = "/.netlify/functions/lesspub/inbox"
+
+[[headers]]
+for = "/.well-known/webfinger"
+[headers.values]
+Content-Type = "application/jrd+json"
+
+[[headers]]
+for = "/actor.jsonld"
+[headers.values]
+Content-Type = "application/activity+json"
+
+[[headers]]
+for = "/followers"
+[headers.values]
+Content-Type = "application/activity+json"
+
+[[headers]]
+for = "/outbox"
+[headers.values]
+Content-Type = "application/activity+json"
+
+[[headers]]
+for = "/note/*"
+[headers.values]
+Content-Type = "application/activity+json"
+
+[[headers]]
+for = "/create/*"
+[headers.values]
+Content-Type = "application/activity+json"
+
+[[headers]]
+for = "/likes/*"
+[headers.values]
+Content-Type = "application/activity+json"
+
+[[headers]]
+for = "/replies/*"
+[headers.values]
+Content-Type = "application/activity+json"

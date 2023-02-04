@@ -1,0 +1,10 @@
+{
+    "subject": "acct:<YOUR_ACCOUNT_NAME>@<YOUR_HOST>",
+    "links": [
+        {
+            "rel": "self",
+            "type": "application/activity+json",
+            "href": "https://<YOUR_HOST>/actor"
+        }
+    ]
+}

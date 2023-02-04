@@ -1,0 +1,15 @@
+{
+  "name": "lesspub",
+  "sources": {
+    "dir": "."
+  },
+  "package-specs": {
+    "module": "commonjs",
+    "in-source": true
+  },
+  "suffix": ".js",
+  "bsc-flags": [
+    "-open Belt"
+  ],
+  "bs-dependencies": []
+}
