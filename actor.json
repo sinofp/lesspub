@@ -6,6 +6,7 @@
     "id": "https://<YOUR_HOST>/actor",
     "type": "Person",
     "followers": "https://<YOUR_HOST>/followers",
+    "preferredUsername": "<YOUR_ACCOUNT_NAME>",
     "name": "<YOUR_DISPLAY_NAME>",
     "summary": "<YOUR_BIO>",
     "discoverable": true,
