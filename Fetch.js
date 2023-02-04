@@ -70,7 +70,7 @@ async function put(content, path, sha) {
                 body: JSON.stringify({
                       message: "Update ActivityPub file",
                       committer: {
-                        name: "ActivityPub function",
+                        name: "LessPub Bot",
                         email: "no-email@example.com"
                       },
                       content: Buffer.from(content).toString("base64"),
@@ -86,7 +86,7 @@ async function $$delete(path, sha) {
                 body: JSON.stringify({
                       message: "Delete ActivityPub file",
                       committer: {
-                        name: "ActivityPub function",
+                        name: "LessPub Bot",
                         email: "no-email@example.com"
                       },
                       sha: sha

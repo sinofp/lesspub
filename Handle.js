@@ -60,7 +60,7 @@ async function follow(incoming) {
         actor: Config.actor,
         object: Caml_option.some(incoming)
       });
-  if (res.ok && await Fetch.GitHub.insertToFile(actor, "/users/test/followers")) {
+  if (res.ok && await Fetch.GitHub.insertToFile(actor, "/followers")) {
     return {
             statusCode: 200
           };
@@ -75,7 +75,7 @@ async function follow(incoming) {
 async function unfollow(incoming) {
   var actor = incoming.actor;
   if (actor !== undefined) {
-    if (await Fetch.GitHub.removeFromFile(actor, "/users/test/followers")) {
+    if (await Fetch.GitHub.removeFromFile(actor, "/followers")) {
       return {
               statusCode: 200
             };

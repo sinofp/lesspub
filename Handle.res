@@ -43,7 +43,7 @@ let follow = async incoming =>
         )
         if (
           res.ok &&
-          await actor->StringOption.fromString->GitHub.insertToFile("/users/test/followers")
+          await actor->StringOption.fromString->GitHub.insertToFile("/followers")
         ) {
           {statusCode: 200}
         } else {
@@ -57,7 +57,7 @@ let unfollow = async incoming =>
   switch incoming.actor {
   | None => {statusCode: 400, body: "Where's your actor?"}
   | Some(actor) =>
-    if await actor->StringOption.fromString->GitHub.removeFromFile("/users/test/followers") {
+    if await actor->StringOption.fromString->GitHub.removeFromFile("/followers") {
       {statusCode: 200}
     } else {
       {statusCode: 500, body: "Can't update DB"}

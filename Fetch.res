@@ -46,7 +46,7 @@ module GitHub = {
           "headers": headers,
           "body": {
             "message": "Update ActivityPub file",
-            "committer": {"name": "ActivityPub function", "email": "no-email@example.com"},
+            "committer": {"name": "LessPub Bot", "email": "no-email@example.com"},
             "content": atob(content),
             "sha": sha, // Only needed for updating
           }
@@ -65,7 +65,7 @@ module GitHub = {
           "headers": headers,
           "body": {
             "message": "Delete ActivityPub file",
-            "committer": {"name": "ActivityPub function", "email": "no-email@example.com"},
+            "committer": {"name": "LessPub Bot", "email": "no-email@example.com"},
             "sha": sha,
           }
           ->Obj.magic
