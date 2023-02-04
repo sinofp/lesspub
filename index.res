@@ -11,7 +11,7 @@ let handler = async (event, _): response => {
     "path": path,
     "headers": headers,
   })
-  let post_verified = event.httpMethod == #POST && (await verify(event))
+  let post_verified = httpMethod == #POST && (await verify(event))
   Js.log2("post_verified:", post_verified)
 
   let activity = event.body->Option.map(fromString)
@@ -22,10 +22,7 @@ let handler = async (event, _): response => {
     }
   )
 
-  let path = event.path->Js.String2.sliceToEnd(~from=Config.functionPath->Js.String2.length)
-  Js.log2("API path:", path)
-
-  switch (event.httpMethod, path, post_verified, activity) {
+  switch (httpMethod, path, post_verified, activity) {
   | (#GET, "/actor", _, _) => actor(event)
   | (#POST, _, false, _) => {statusCode: 401}
   | (#POST, "/inbox", _, Some(Ok({type_: #Follow} as act))) => await follow(act)

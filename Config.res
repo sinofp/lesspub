@@ -9,5 +9,3 @@ let ghBaseURL = env->get("AP_GH_BASE_URL")->Option.getExn
 
 let actor = baseURL ++ "/actor"
 let keyId = actor ++ "#main-key"
-
-let functionPath = "/.netlify/functions/lesspub"

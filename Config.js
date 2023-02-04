@@ -16,13 +16,10 @@ var actor = baseURL + "/actor";
 
 var keyId = actor + "#main-key";
 
-var functionPath = "/.netlify/functions/lesspub";
-
 exports.baseURL = baseURL;
 exports.privateKey = privateKey;
 exports.ghToken = ghToken;
 exports.ghBaseURL = ghBaseURL;
 exports.actor = actor;
 exports.keyId = keyId;
-exports.functionPath = functionPath;
 /* baseURL Not a pure module */

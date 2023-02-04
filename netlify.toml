@@ -1,10 +1,12 @@
 [[redirects]]
 from = "/actor"
 to = "/.netlify/functions/lesspub/actor"
+status = 200
 
 [[redirects]]
 from = "/inbox"
 to = "/.netlify/functions/lesspub/inbox"
+status = 200
 
 [[headers]]
 for = "/.well-known/webfinger"
