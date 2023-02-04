@@ -9,3 +9,5 @@ let ghBaseURL = env->get("AP_GH_BASE_URL")->Option.getExn
 
 let actor = baseURL ++ "/actor"
 let keyId = actor ++ "#main-key"
+
+@module external actorJSON: Js.Json.t = "../../../actor.json"

@@ -17,13 +17,22 @@ function actor(e) {
   var match = Belt_Option.map(Js_dict.get(e.headers, "accept"), (function (param) {
           return Js_string.startsWith("text/html", param);
         }));
+  if (match !== undefined && match) {
+    return {
+            statusCode: 302,
+            headers: Caml_option.some(Js_dict.fromArray([[
+                        "Location",
+                        Config.baseURL
+                      ]]))
+          };
+  }
   return {
-          statusCode: 302,
-          headers: {
-            location: Config.baseURL + (
-              match !== undefined && match ? "" : "/actor.jsonld"
-            )
-          }
+          statusCode: 200,
+          headers: Caml_option.some(Js_dict.fromArray([[
+                      "Content-Type",
+                      "application/activity+json"
+                    ]])),
+          body: JSON.stringify(Config.actorJSON)
         };
 }
 

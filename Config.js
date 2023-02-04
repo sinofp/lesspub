@@ -3,6 +3,7 @@
 
 var Js_dict = require("rescript/lib/js/js_dict.js");
 var Belt_Option = require("rescript/lib/js/belt_Option.js");
+var ActorJson = require("../../../actor.json");
 
 var baseURL = Belt_Option.getExn(Js_dict.get(process.env, "AP_BASE_URL"));
 
@@ -16,10 +17,13 @@ var actor = baseURL + "/actor";
 
 var keyId = actor + "#main-key";
 
+var actorJSON = ActorJson;
+
 exports.baseURL = baseURL;
 exports.privateKey = privateKey;
 exports.ghToken = ghToken;
 exports.ghBaseURL = ghBaseURL;
 exports.actor = actor;
 exports.keyId = keyId;
+exports.actorJSON = actorJSON;
 /* baseURL Not a pure module */

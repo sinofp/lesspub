@@ -1,16 +1,15 @@
 open Event
 open Object
 
-let actor = (e: event) => {
-  statusCode: 302,
-  headers: {
-    "location": Config.baseURL ++
-    switch e.headers->Js.Dict.get("accept")->Belt.Option.map(Js.String.startsWith("text/html")) {
-    | Some(true) => ""
-    | _ => "/actor.jsonld" // Content-Type is set in Netlify.toml
-    },
-  }->Obj.magic,
-}
+let actor = (e: event) =>
+  switch e.headers->Js.Dict.get("accept")->Belt.Option.map(Js.String.startsWith("text/html")) {
+  | Some(true) => {statusCode: 302, headers: [("Location", Config.baseURL)]->Js.Dict.fromArray}
+  | _ => {
+      statusCode: 200,
+      headers: [("Content-Type", "application/activity+json")]->Js.Dict.fromArray,
+      body: Config.actorJSON->Js.Json.stringify,
+    }
+  }
 
 module URL = {
   type t = {
