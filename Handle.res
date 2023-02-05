@@ -67,22 +67,24 @@ let noteId2Slug = id => id->Js.String2.sliceToEnd(~from=noteBaseLength)
 
 let slugExist = async slug => (await fetch(Config.baseURL ++ slug, {"method": #HEAD})).ok
 
-let like = async incoming =>
+let like = async (~undo=false, incoming) =>
   switch (incoming.actor, incoming.object) {
-  | (Some(actor), Some(object)) =>
-    switch object->StringOption.classify {
-    | Wrap(_) => {statusCode: 501, body: "Give me only the object id, please"}
-    | String(id) => {
-        let slug = id->noteId2Slug
-        let forMe = await slug->slugExist
-        let path = slug ++ "-likes.jsonld"
-        if !forMe || await actor->StringOption.fromString->GitHub.insertToFile(path) {
-          {statusCode: 200}
-        } else {
-          {statusCode: 500, body: "Can't update DB"}
-        }
+  | (Some(actor), Some(object)) => {
+      let slug = object->getId->noteId2Slug
+      let forMe = await slug->slugExist
+      let path = "/likes" ++ slug
+      let update = if undo {
+        GitHub.removeFromFile
+      } else {
+        GitHub.insertToFile
+      }
+      if !forMe || await actor->StringOption.fromString->update(path) {
+        {statusCode: 200}
+      } else {
+        {statusCode: 500, body: "Can't update DB"}
       }
     }
+
   | _ => {statusCode: 400, body: "I need both actor and object"}
   }
 
@@ -113,7 +115,8 @@ let undo = async incoming =>
     switch object->StringOption.classify {
     | String(_) => {statusCode: 501, body: "Give me the whole object, please"}
     | Wrap({type_: #Follow} as obj) => await unfollow(obj)
-    | Wrap(_) => {statusCode: 501}
+    | Wrap({type_: #Like} as obj) => await like(obj, ~undo=true)
+    | Wrap(_) => {statusCode: 501, body: "I can only Undo Follow or Like"}
     }
   | None => {statusCode: 400, body: "I need object"}
   }

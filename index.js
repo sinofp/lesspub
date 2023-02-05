@@ -65,7 +65,7 @@ async function handler($$event, param) {
   } else if (match === "Create") {
     return await Handle.create(act);
   } else if (match === "Like") {
-    return await Handle.like(act);
+    return await Handle.like(undefined, act);
   } else if (match === "Undo") {
     return await Handle.undo(act);
   } else {
