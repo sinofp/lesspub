@@ -60,7 +60,9 @@ async function handler($$event, param) {
   }
   var act = activity._0;
   var match = act.type;
-  if (match === "Follow") {
+  if (match === "Delete") {
+    return await Handle.$$delete(act);
+  } else if (match === "Follow") {
     return await Handle.follow(act);
   } else if (match === "Create") {
     return await Handle.create(act);

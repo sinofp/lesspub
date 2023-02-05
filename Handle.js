@@ -169,8 +169,32 @@ async function create(incoming) {
   }
   var slug = inReplyTo.slice(noteBaseLength);
   var forMe = await slugExist(slug);
-  var path = slug + "-replies.jsonld";
+  var path = "/replies" + slug;
   if (!forMe || await Fetch.GitHub.insertToFile(obj$1, path)) {
+    return {
+            statusCode: 200
+          };
+  } else {
+    return {
+            statusCode: 500,
+            body: "Can't update DB"
+          };
+  }
+}
+
+async function $$delete(incoming) {
+  var object = incoming.object;
+  if (object === undefined) {
+    return {
+            statusCode: 400,
+            body: "I need object"
+          };
+  }
+  var object$1 = Caml_option.valFromOption(object);
+  var slug = $$Object.getId(object$1).slice(noteBaseLength);
+  var forMe = await slugExist(slug);
+  var path = "/replies" + slug;
+  if (!forMe || await Fetch.GitHub.removeFromFile(object$1, path)) {
     return {
             statusCode: 200
           };
@@ -220,5 +244,6 @@ exports.noteId2Slug = noteId2Slug;
 exports.slugExist = slugExist;
 exports.like = like;
 exports.create = create;
+exports.$$delete = $$delete;
 exports.undo = undo;
 /* noteBaseLength Not a pure module */

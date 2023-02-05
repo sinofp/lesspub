@@ -96,7 +96,7 @@ let create = async incoming =>
     | Wrap({type_: #Note, inReplyTo} as obj) => {
         let slug = inReplyTo->noteId2Slug
         let forMe = await slug->slugExist
-        let path = slug ++ "-replies.jsonld"
+        let path = "/replies" ++ slug
         if !forMe || await obj->StringOption.wrap->GitHub.insertToFile(path) {
           {statusCode: 200}
         } else {
@@ -106,6 +106,22 @@ let create = async incoming =>
 
     | Wrap(_) => {statusCode: 400, body: "I only support reply"}
     }
+  | None => {statusCode: 400, body: "I need object"}
+  }
+
+let delete = async incoming =>
+  switch incoming.object {
+  | Some(object) => {
+      let slug = object->getId->noteId2Slug
+      let forMe = await slug->slugExist
+      let path = "/replies" ++ slug // Assumption: the only thing can be deleted is a reply
+      if !forMe || await object->GitHub.removeFromFile(path) {
+        {statusCode: 200}
+      } else {
+        {statusCode: 500, body: "Can't update DB"}
+      }
+    }
+
   | None => {statusCode: 400, body: "I need object"}
   }
 
