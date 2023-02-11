@@ -65,7 +65,10 @@ let noteBaseLength = (Config.baseURL ++ "/note")->Js.String2.length
 // example.com/note/slug => /slug
 let noteId2Slug = id => id->Js.String2.sliceToEnd(~from=noteBaseLength)
 
-let slugExist = async slug => (await fetch(Config.baseURL ++ slug, {"method": #HEAD})).ok
+let slugExist = async slug =>
+  try (await fetch(Config.baseURL ++ slug, {"method": #HEAD})).ok catch {
+  | _ => false // FetchError: ENOTFOUND
+  }
 
 let like = async (~undo=false, incoming) =>
   switch (incoming.actor, incoming.object) {

@@ -101,9 +101,14 @@ function noteId2Slug(id) {
 }
 
 async function slugExist(slug) {
-  return (await NodeFetch(Config.baseURL + slug, {
-                method: "HEAD"
-              })).ok;
+  try {
+    return (await NodeFetch(Config.baseURL + slug, {
+                  method: "HEAD"
+                })).ok;
+  }
+  catch (exn){
+    return false;
+  }
 }
 
 async function like(undoOpt, incoming) {
