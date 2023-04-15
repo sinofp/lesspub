@@ -3,6 +3,7 @@
 import * as Fs from "fs";
 import * as Path from "path";
 import * as Fetch from "./Fetch.js";
+import * as Config from "./Config.js";
 import * as Egress from "./Egress.js";
 import * as $$Object from "./Object.js";
 import * as Nodeurl from "node:url";
@@ -34,9 +35,9 @@ async function main(param) {
               return Pervasives.failwith("Followers should be string");
             }
           });
-      var inboxes = Belt_Array.keepMap(await Promise.all(followers$1.map(Fetch.fetchInbox)), (function (x) {
-              return x;
-            }));
+      var inboxes = Belt_Array.concat(Belt_Array.keepMap(await Promise.all(followers$1.map(Fetch.fetchInbox)), (function (x) {
+                  return x;
+                })), Config.extraInboxes);
       return await Promise.all(inboxes.map(function (x) {
                       console.log("Sending to", x);
                       var match = new Nodeurl.URL(x);

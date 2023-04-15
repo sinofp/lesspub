@@ -7,6 +7,8 @@ let privateKey =
   env->get("AP_PRIVATE_KEY")->Option.getExn->Js.String2.replaceByRe(%re("/\\n/g"), "\n")
 let ghToken = env->get("AP_GH_TOKEN")->Option.getExn
 let ghBaseURL = env->get("AP_GH_BASE_URL")->Option.getExn
+let extraInboxes =
+  env->get("AP_EXTRA_INBOXES")->Option.map(Js.String.split(","))->Option.getWithDefault([])
 
 let actor = baseURL ++ "/actor"
 let keyId = actor ++ "#main-key"

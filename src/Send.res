@@ -23,7 +23,12 @@ let main = async () => {
     }
   )
   // TODO sharedInbox
-  let inboxes = (await followers->Js.Array2.map(Fetch.fetchInbox)->all)->Array.keepMap(x => x)
+  let inboxes =
+    (await followers
+    ->Js.Array2.map(Fetch.fetchInbox)
+    ->all)
+    ->Array.keepMap(x => x)
+    ->Array.concat(Config.extraInboxes)
 
   await inboxes
   ->Js.Array2.map(x => {
