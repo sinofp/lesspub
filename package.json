@@ -1,6 +1,7 @@
 {
   "name": "lesspub",
   "version": "0.1.0",
+  "type": "module",
   "scripts": {
     "res:build": "rescript",
     "res:clean": "rescript clean",
