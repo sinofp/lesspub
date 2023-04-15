@@ -3,7 +3,7 @@
 import * as Config from "./Config.js";
 import * as $$Object from "./Object.js";
 import * as Security from "./Security.js";
-import * as NodeFetch from "node-fetch";
+import NodeFetch from "node-fetch";
 
 function post(host, path, activity) {
   var body = JSON.stringify($$Object.toJSON(activity));

@@ -8,7 +8,7 @@ import * as $$Object from "./Object.js";
 import * as Js_dict from "rescript/lib/es6/js_dict.js";
 import * as Nodeurl from "node:url";
 import * as Js_string from "rescript/lib/es6/js_string.js";
-import * as NodeFetch from "node-fetch";
+import NodeFetch from "node-fetch";
 import * as Belt_Option from "rescript/lib/es6/belt_Option.js";
 import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import * as Nodecrypto from "node:crypto";

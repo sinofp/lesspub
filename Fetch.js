@@ -5,7 +5,7 @@ import * as Js_exn from "rescript/lib/es6/js_exn.js";
 import * as $$Object from "./Object.js";
 import * as Js_dict from "rescript/lib/es6/js_dict.js";
 import * as Js_json from "rescript/lib/es6/js_json.js";
-import * as NodeFetch from "node-fetch";
+import NodeFetch from "node-fetch";
 import * as Belt_Option from "rescript/lib/es6/belt_Option.js";
 import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import * as Caml_js_exceptions from "rescript/lib/es6/caml_js_exceptions.js";
