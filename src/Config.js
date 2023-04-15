@@ -2,7 +2,7 @@
 
 import * as Js_dict from "rescript/lib/es6/js_dict.js";
 import * as Belt_Option from "rescript/lib/es6/belt_Option.js";
-import * as ActorJson from "../../../actor.json";
+import * as ActorJson from "../../../../actor.json";
 
 var baseURL = Belt_Option.getExn(Js_dict.get(process.env, "AP_BASE_URL"));
 

@@ -1,7 +1,7 @@
 {
   "name": "lesspub",
   "sources": {
-    "dir": "."
+    "dir": "src"
   },
   "package-specs": {
     "module": "es6",
