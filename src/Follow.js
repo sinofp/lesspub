@@ -10,10 +10,7 @@ import * as Js_promise2 from "rescript/lib/es6/js_promise2.js";
 import * as Nodecrypto from "node:crypto";
 
 async function main(param) {
-  var actors = [
-    "https://relay.nya.one/actor",
-    "https://dvd.chat/@200G"
-  ];
+  var actors = ["https://dvd.chat/users/9gt1gfwbnibzwcur"];
   var inboxes = await Promise.all(actors.map(Fetch.fetchInbox));
   var pairs = Belt_Array.keepMap(Belt_Array.zip(actors, inboxes), (function (param) {
           var opt = param[1];
@@ -30,7 +27,7 @@ async function main(param) {
                   console.log("Sending to", inbox);
                   var url = new Nodeurl.URL(inbox);
                   return Egress.post(url.host, url.pathname, {
-                              id: Nodecrypto.randomUUID(),
+                              id: Config.actor + "/follow/" + Nodecrypto.randomUUID(),
                               type: "Follow",
                               actor: Config.actor,
                               object: Caml_option.some(param[0])

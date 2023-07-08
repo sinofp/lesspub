@@ -35,7 +35,7 @@ let follow = async incoming =>
           url.host,
           url.pathname,
           {
-            id: randomUUID(),
+            id: Config.actor ++ "/follow/" ++ randomUUID(),
             type_: #Accept,
             actor: Config.actor,
             object: incoming->StringOption.wrap,

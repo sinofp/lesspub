@@ -55,7 +55,7 @@ async function follow(incoming) {
   }
   var url = new Nodeurl.URL(inbox);
   var res = await Egress.post(url.host, url.pathname, {
-        id: Nodecrypto.randomUUID(),
+        id: Config.actor + "/follow/" + Nodecrypto.randomUUID(),
         type: "Accept",
         actor: Config.actor,
         object: Caml_option.some(incoming)

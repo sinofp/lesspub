@@ -7,7 +7,7 @@ open Fetch
 // Note: this function is only for testing if my message will be accepted.
 // After all, what's the point to follow someone as a static blog?
 let main = async () => {
-  let actors = ["https://relay.nya.one/actor", "https://dvd.chat/@200G"]
+  let actors = ["https://dvd.chat/users/9gt1gfwbnibzwcur"]
   let inboxes = await actors->Js.Array2.map(x => x->fetchInbox)->all
   let pairs = Array.zip(actors, inboxes)->Array.keepMap(((a, opt)) =>
     switch (a, opt) {
@@ -25,7 +25,7 @@ let main = async () => {
       url.host,
       url.pathname,
       {
-        id: randomUUID(),
+        id: Config.actor ++ "/follow/" ++ randomUUID(),
         type_: #Follow,
         actor: Config.actor,
         object: actor->StringOption.fromString,
