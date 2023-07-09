@@ -176,7 +176,7 @@ async function removeFromFile(ooi, path) {
           });
       if (match$1 !== -1) {
         if (totalItems !== 1) {
-          orderedItems.splice(match$1);
+          orderedItems.splice(match$1, 1);
           collection$1.totalItems = totalItems - 1 | 0;
           collection$1.orderedItems = orderedItems;
           return await put(JSON.stringify($$Object.toJSON(collection$1)), path, sha);

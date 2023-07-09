@@ -120,7 +120,7 @@ module GitHub = {
         | (_, -1) => true
         | (1, _) => await delete(path, sha->Option.getExn)
         | (_, i) => {
-            let _ = orderedItems->Js.Array2.removeFromInPlace(~pos=i)
+            let _ = orderedItems->Js.Array2.removeCountInPlace(~pos=i, ~count=1)
             collection.totalItems = Some(totalItems - 1)
             collection.orderedItems = Some(orderedItems)
             await collection->toJSON->Js.Json.stringify->put(path, sha)
