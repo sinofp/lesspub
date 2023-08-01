@@ -9,6 +9,8 @@ Supported Activities and Objects:
 - Receive Undo-Follow.
 - Receive Like.
 - Receive Undo-Like.
+- Receive Announce (boost).
+- Receive Undo-Announce (currently [Mastodon only send Undo-Announce to followers](https://github.com/mastodon/mastodon/issues/18471), while Firefish can send that to you).
 - Receive Create-Note as reply to your blog posts.
 - Receive Delete-Note to delete a reply.
 

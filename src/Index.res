@@ -27,6 +27,7 @@ let handler = async (event, _): response => {
     | #Follow => follow
     | #Create => create
     | #Like => like(~undo=false)
+    | #Announce => announce(~undo=false)
     | #Undo => undo
     | #Delete => delete
     | #Accept | #Note | #OrderedCollection =>

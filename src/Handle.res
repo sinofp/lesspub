@@ -70,17 +70,13 @@ let slugExist = async slug =>
   | _ => false // FetchError: ENOTFOUND
   }
 
-let like = async (~undo=false, incoming) =>
+let nonTextReaction = async (~pathPrefix, ~undo, incoming) =>
   switch (incoming.actor, incoming.object) {
   | (Some(actor), Some(object)) => {
       let slug = object->getId->noteId2Slug
       let forMe = await slug->slugExist
-      let path = "/likes" ++ slug
-      let update = if undo {
-        GitHub.removeFromFile
-      } else {
-        GitHub.insertToFile
-      }
+      let path = pathPrefix ++ slug
+      let update = undo ? GitHub.removeFromFile : GitHub.insertToFile
       if !forMe || await actor->StringOption.fromString->update(path) {
         {statusCode: 200}
       } else {
@@ -90,6 +86,10 @@ let like = async (~undo=false, incoming) =>
 
   | _ => {statusCode: 400, body: "I need both actor and object"}
   }
+
+let like = nonTextReaction(~pathPrefix="/likes")
+
+let announce = nonTextReaction(~pathPrefix="/announces")
 
 let create = async incoming =>
   switch incoming.object {
@@ -135,6 +135,7 @@ let undo = async incoming =>
     | String(_) => {statusCode: 501, body: "Give me the whole object, please"}
     | Wrap({type_: #Follow} as obj) => await unfollow(obj)
     | Wrap({type_: #Like} as obj) => await like(obj, ~undo=true)
+    | Wrap({type_: #Announce} as obj) => await announce(obj, ~undo=true)
     | Wrap(_) => {statusCode: 501, body: "I can only Undo Follow or Like"}
     }
   | None => {statusCode: 400, body: "I need object"}

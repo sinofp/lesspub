@@ -110,8 +110,7 @@ async function slugExist(slug) {
   }
 }
 
-async function like(undoOpt, incoming) {
-  var undo = undoOpt !== undefined ? undoOpt : false;
+async function nonTextReaction(pathPrefix, undo, incoming) {
   var match = incoming.actor;
   var match$1 = incoming.object;
   if (match === undefined) {
@@ -128,7 +127,7 @@ async function like(undoOpt, incoming) {
   }
   var slug = $$Object.getId(Caml_option.valFromOption(match$1)).slice(noteBaseLength);
   var forMe = await slugExist(slug);
-  var path = "/likes" + slug;
+  var path = pathPrefix + slug;
   var update = undo ? Fetch.GitHub.removeFromFile : Fetch.GitHub.insertToFile;
   if (!forMe || await Curry._2(update, match, path)) {
     return {
@@ -140,6 +139,14 @@ async function like(undoOpt, incoming) {
             body: "Can't update DB"
           };
   }
+}
+
+function like(param, param$1) {
+  return nonTextReaction("/likes", param, param$1);
+}
+
+function announce(param, param$1) {
+  return nonTextReaction("/announces", param, param$1);
 }
 
 async function create(incoming) {
@@ -227,10 +234,12 @@ async function undo(incoming) {
   }
   var obj$1 = obj._0;
   var match = obj$1.type;
-  if (match === "Follow") {
+  if (match === "Announce") {
+    return await nonTextReaction("/announces", true, obj$1);
+  } else if (match === "Follow") {
     return await unfollow(obj$1);
   } else if (match === "Like") {
-    return await like(true, obj$1);
+    return await nonTextReaction("/likes", true, obj$1);
   } else {
     return {
             statusCode: 501,
@@ -247,7 +256,9 @@ export {
   noteBaseLength ,
   noteId2Slug ,
   slugExist ,
+  nonTextReaction ,
   like ,
+  announce ,
   create ,
   $$delete ,
   undo ,

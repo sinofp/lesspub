@@ -18,6 +18,7 @@ module StringOption = {
 type typeName = [
   | #OrderedCollection
   | #Accept
+  | #Announce
   | #Create
   | #Delete
   | #Follow
