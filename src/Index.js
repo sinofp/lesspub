@@ -23,6 +23,33 @@ async function handler($$event, param) {
           }
           console.log("Can't parse body as an ActivityStream Object:", x._0);
         }));
+  var handlers = function (t) {
+    if (t === "Delete") {
+      return Handle.$$delete;
+    }
+    if (t === "Follow") {
+      return Handle.follow;
+    }
+    if (t === "Create") {
+      return Handle.create;
+    }
+    if (t !== "Like") {
+      if (t === "Undo") {
+        return Handle.undo;
+      } else {
+        return function (param) {
+          return Promise.resolve({
+                      statusCode: 400,
+                      body: "Why are you sending this to me?"
+                    });
+        };
+      }
+    }
+    var partial_arg = false;
+    return function (param) {
+      return Handle.like(partial_arg, param);
+    };
+  };
   if (httpMethod === "GET") {
     if (path === "/actor") {
       return Handle.actor($$event);
@@ -58,22 +85,7 @@ async function handler($$event, param) {
           };
   }
   var act = activity._0;
-  var match = act.type;
-  if (match === "Delete") {
-    return await Handle.$$delete(act);
-  } else if (match === "Follow") {
-    return await Handle.follow(act);
-  } else if (match === "Create") {
-    return await Handle.create(act);
-  } else if (match === "Like") {
-    return await Handle.like(undefined, act);
-  } else if (match === "Undo") {
-    return await Handle.undo(act);
-  } else {
-    return {
-            statusCode: 501
-          };
-  }
+  return await handlers(act.type)(act);
 }
 
 export {

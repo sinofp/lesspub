@@ -22,14 +22,21 @@ let handler = async (event, _): response => {
     }
   )
 
+  let handlers = t =>
+    switch t {
+    | #Follow => follow
+    | #Create => create
+    | #Like => like(~undo=false)
+    | #Undo => undo
+    | #Delete => delete
+    | #Accept | #Note | #OrderedCollection =>
+      _ => Js.Promise2.resolve({statusCode: 400, body: "Why are you sending this to me?"})
+    }
+
   switch (httpMethod, path, post_verified, activity) {
   | (#GET, "/actor", _, _) => actor(event)
   | (#POST, _, false, _) => {statusCode: 401}
-  | (#POST, "/inbox", _, Some(Ok({type_: #Follow} as act))) => await follow(act)
-  | (#POST, "/inbox", _, Some(Ok({type_: #Create} as act))) => await create(act)
-  | (#POST, "/inbox", _, Some(Ok({type_: #Like} as act))) => await like(act)
-  | (#POST, "/inbox", _, Some(Ok({type_: #Undo} as act))) => await undo(act)
-  | (#POST, "/inbox", _, Some(Ok({type_: #Delete} as act))) => await delete(act)
+  | (#POST, "/inbox", _, Some(Ok(_ as act))) => await act.type_->handlers(act)
   | _ => {statusCode: 501}
   }
 }
