@@ -11,7 +11,6 @@
   "author": "sinofp",
   "license": "BSD-2-Clause",
   "dependencies": {
-    "node-fetch": "^3.3.0",
     "rescript": "^10.1.2"
   }
 }

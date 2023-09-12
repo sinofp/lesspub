@@ -3,7 +3,6 @@
 import * as Config from "./Config.js";
 import * as $$Object from "./Object.js";
 import * as Security from "./Security.js";
-import NodeFetch from "node-fetch";
 
 function post(host, path, activity) {
   var body = JSON.stringify($$Object.toJSON(activity));
@@ -23,7 +22,7 @@ function post(host, path, activity) {
     }
   };
   console.log("I will send:", fetch_options);
-  return NodeFetch("https://" + host + "" + path + "", fetch_options);
+  return fetch("https://" + host + "" + path + "", fetch_options);
 }
 
 export {

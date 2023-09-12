@@ -1,5 +1,5 @@
 type response = {ok: bool}
-@module("node-fetch") external fetch: (string, 'a) => promise<response> = "default"
+@val external fetch: (string, 'a) => promise<response> = "fetch"
 @send external text: response => promise<string> = "text"
 @send external json: response => promise<Js.Dict.t<Js.Json.t>> = "json"
 

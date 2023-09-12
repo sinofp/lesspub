@@ -5,7 +5,6 @@ import * as Js_exn from "rescript/lib/es6/js_exn.js";
 import * as $$Object from "./Object.js";
 import * as Js_dict from "rescript/lib/es6/js_dict.js";
 import * as Js_json from "rescript/lib/es6/js_json.js";
-import NodeFetch from "node-fetch";
 import * as Belt_Option from "rescript/lib/es6/belt_Option.js";
 import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import * as Caml_js_exceptions from "rescript/lib/es6/caml_js_exceptions.js";
@@ -15,7 +14,7 @@ var headers = {
 };
 
 async function fetchKey(keyId) {
-  var res = await NodeFetch(keyId, {
+  var res = await fetch(keyId, {
         headers: headers
       });
   try {
@@ -33,7 +32,7 @@ async function fetchKey(keyId) {
 }
 
 async function fetchInbox(actor) {
-  var res = await NodeFetch(actor, {
+  var res = await fetch(actor, {
         headers: headers
       });
   try {
@@ -63,7 +62,7 @@ var headers$1 = {
 };
 
 async function put(content, path, sha) {
-  return (await NodeFetch(Config.ghBaseURL + path, {
+  return (await fetch(Config.ghBaseURL + path, {
                 method: "PUT",
                 headers: headers$1,
                 body: JSON.stringify({
@@ -79,7 +78,7 @@ async function put(content, path, sha) {
 }
 
 async function $$delete(path, sha) {
-  return (await NodeFetch(Config.ghBaseURL + path, {
+  return (await fetch(Config.ghBaseURL + path, {
                 method: "DELETE",
                 headers: headers$1,
                 body: JSON.stringify({
@@ -94,7 +93,7 @@ async function $$delete(path, sha) {
 }
 
 async function get(path) {
-  var res = await NodeFetch(Config.ghBaseURL + path, {
+  var res = await fetch(Config.ghBaseURL + path, {
         headers: headers$1
       });
   if (!res.ok) {
