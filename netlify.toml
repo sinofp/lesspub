@@ -1,3 +1,4 @@
+# Redirect
 [[redirects]]
 from = "/actor"
 to = "/.netlify/functions/lesspub/actor"
@@ -47,3 +48,10 @@ Content-Type = "application/activity+json"
 for = "/replies/*"
 [headers.values]
 Content-Type = "application/activity+json"
+
+# Build
+[[plugins]]
+package = "@netlify/plugin-functions-install-core"
+
+[functions.lesspub]
+node_bundler = "esbuild"
