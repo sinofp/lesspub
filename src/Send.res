@@ -2,12 +2,15 @@ open Object
 open Js.Promise2
 
 let main = async () => {
-  let path = Node.Path.join(["public", "outbox"])
-  let outbox = Node.Fs.readFileAsUtf8Sync(path)
+  let path_public = Node.Path.join(["public", "outbox"])
+  let path_static = Node.Path.join(["static", "outbox"])
+  let outbox = try Node.Fs.readFileAsUtf8Sync(path_public) catch {
+  | Js.Exn.Error(_) => Node.Fs.readFileAsUtf8Sync(path_static)
+  }
   let {orderedItems} = fromString(outbox)->Result.getExn
 
   let last_create_note = switch orderedItems->Js.Array2.unsafe_get(0)->StringOption.classify {
-  | String(_) => failwith("No String")
+  | String(_) => failwith("I need the Create Object, not Create id")
   | Wrap(obj) => obj
   }
   Js.log2("I will send the last note:", last_create_note->toJSON)

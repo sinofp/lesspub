@@ -6,25 +6,39 @@ var Path = require("path");
 var Fetch = require("./Fetch.js");
 var Config = require("./Config.js");
 var Egress = require("./Egress.js");
+var Js_exn = require("rescript/lib/js/js_exn.js");
 var $$Object = require("./Object.js");
 var Nodeurl = require("node:url");
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
 var Pervasives = require("rescript/lib/js/pervasives.js");
 var Belt_Result = require("rescript/lib/js/belt_Result.js");
 var Js_promise2 = require("rescript/lib/js/js_promise2.js");
+var Caml_js_exceptions = require("rescript/lib/js/caml_js_exceptions.js");
 
 async function main(param) {
-  var path = Path.join("public", "outbox");
-  var outbox = Fs.readFileSync(path, "utf8");
+  var path_public = Path.join("public", "outbox");
+  var path_static = Path.join("static", "outbox");
+  var outbox;
+  try {
+    outbox = Fs.readFileSync(path_public, "utf8");
+  }
+  catch (raw_exn){
+    var exn = Caml_js_exceptions.internalToOCamlException(raw_exn);
+    if (exn.RE_EXN_ID === Js_exn.$$Error) {
+      outbox = Fs.readFileSync(path_static, "utf8");
+    } else {
+      throw exn;
+    }
+  }
   var match = Belt_Result.getExn($$Object.fromString(outbox));
   var orderedItems = match.orderedItems;
   if (orderedItems !== undefined) {
     var obj = $$Object.StringOption.classify(orderedItems[0]);
     var last_create_note;
-    last_create_note = obj.TAG === /* String */0 ? Pervasives.failwith("No String") : obj._0;
+    last_create_note = obj.TAG === /* String */0 ? Pervasives.failwith("I need the Create Object, not Create id") : obj._0;
     console.log("I will send the last note:", $$Object.toJSON(last_create_note));
-    var path$1 = Path.join("static", "followers");
-    var followers = Fs.readFileSync(path$1, "utf8");
+    var path = Path.join("static", "followers");
+    var followers = Fs.readFileSync(path, "utf8");
     var match$1 = Belt_Result.getExn($$Object.fromString(followers));
     var orderedItems$1 = match$1.orderedItems;
     if (orderedItems$1 !== undefined) {
@@ -49,7 +63,7 @@ async function main(param) {
           RE_EXN_ID: "Match_failure",
           _1: [
             "Send.res",
-            18,
+            21,
             2
           ],
           Error: new Error()
@@ -59,7 +73,7 @@ async function main(param) {
         RE_EXN_ID: "Match_failure",
         _1: [
           "Send.res",
-          7,
+          10,
           2
         ],
         Error: new Error()
