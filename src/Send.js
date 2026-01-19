@@ -50,7 +50,13 @@ async function main(param) {
               return Pervasives.failwith("Followers should be string");
             }
           });
-      var inboxes = Belt_Array.concat(Belt_Array.keepMap(await Promise.all(followers$1.map(Fetch.fetchInbox)), (function (x) {
+      var inboxes = Belt_Array.concat(Belt_Array.keepMap(await Promise.all(followers$1.map(function (actor) {
+                        return Js_promise2.$$catch(Fetch.fetchInbox(actor), (function (e) {
+                                      console.log("Failed to fetch inbox for:", actor);
+                                      console.log("Error:", e);
+                                      return Promise.resolve(undefined);
+                                    }));
+                      })), (function (x) {
                   return x;
                 })), Config.extraInboxes);
       return await Promise.all(inboxes.map(function (x) {

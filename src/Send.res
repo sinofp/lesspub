@@ -28,7 +28,13 @@ let main = async () => {
   // TODO sharedInbox
   let inboxes =
     (await followers
-    ->Js.Array2.map(Fetch.fetchInbox)
+    ->Js.Array2.map(actor =>
+      Fetch.fetchInbox(actor)->catch(e => {
+        Js.log2("Failed to fetch inbox for:", actor)
+        Js.log2("Error:", e)
+        resolve(None)
+      })
+    )
     ->all)
     ->Array.keepMap(x => x)
     ->Array.concat(Config.extraInboxes)
