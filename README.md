@@ -49,7 +49,7 @@ openssl rsa -in private.pem -outform PEM -pubout -out public.pem
 4. Copy `webfinger` to `$BLOG_STATIC_DIRECTORY/.well-known/webfinger` and edit it with your blog details.
 5. Copy `actor.json` to `$BLOG_BASE_DIRECTORY/actor.json` and edit it with your blog details.
 6. Run `atom2activity.sh` to generate `Note Object`, `Create Activity`, `Outbox` (You may need to modify the paths in the script).
-7. Run `node netlify/functions/lesspub/Send.js` to send the latest `Create Activity` from `Outbox`.
+7. Run `node netlify/functions/lesspub/dist/Send.js` to send the latest `Create Activity` from `Outbox`.
 
 You can put the last two steps into your build command to let Netlify run it for you.
 
