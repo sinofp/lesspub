@@ -1,10 +1,10 @@
 open Security
 open Config
-open Object
+open APObject
 
 let post = (host, path, activity) => {
-  let body = Js.Json.stringify(activity->toJSON)
-  let date = Js.Date.make()->Js.Date.toUTCString
+  let body = JSON.stringify(activity->toJSON)
+  let date = Date.make()->Date.toUTCString
   let digest = "SHA-256=" ++ Hash.get(body)
   // TODO extract duplicate logic
   let to_be_signed = `(request-target): post ${path}\nhost: ${host}\ndate: ${date}\ndigest: ${digest}`
@@ -20,6 +20,6 @@ let post = (host, path, activity) => {
       "signature": `keyId="${keyId}",algorithm="rsa-sha256",headers="(request-target) host date digest",signature="${signature}"`,
     },
   }
-  Js.log2("I will send:", fetch_options)
+  Console.log2("I will send:", fetch_options)
   Fetch.fetch(`https://${host}${path}`, fetch_options)
 }

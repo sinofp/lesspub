@@ -1,25 +1,15 @@
 open Event
-open Object
+open APObject
 
 let actor = (e: event) =>
-  switch e.headers->Js.Dict.get("accept")->Belt.Option.map(Js.String.startsWith("text/html")) {
-  | Some(true) => {statusCode: 302, headers: [("Location", Config.baseURL)]->Js.Dict.fromArray}
+  switch e.headers->Dict.get("accept")->Option.map(s => s->String.startsWith("text/html")) {
+  | Some(true) => {statusCode: 302, headers: [("Location", Config.baseURL)]->Dict.fromArray}
   | _ => {
       statusCode: 200,
-      headers: [("Content-Type", "application/activity+json")]->Js.Dict.fromArray,
-      body: Config.actorJSON->Js.Json.stringify,
+      headers: [("Content-Type", "application/activity+json")]->Dict.fromArray,
+      body: Config.actorJSON->JSON.stringify,
     }
   }
-
-module URL = {
-  type t = {
-    host: string,
-    pathname: string,
-  }
-  @module("node:url") @new external make: string => t = "URL"
-}
-
-@module("node:crypto") external randomUUID: unit => string = "randomUUID"
 
 open Fetch
 
@@ -30,18 +20,19 @@ let follow = async incoming =>
     switch await fetchInbox(actor) {
     | None => {statusCode: 400, body: "Where's your inbox?"}
     | Some(inbox) => {
+        open Node
         let url = URL.make(inbox)
         let res = await Egress.post(
           url.host,
           url.pathname,
           {
-            id: Config.actor ++ "/follow/" ++ randomUUID(),
+            id: Config.actor ++ "/follow/" ++ Crypto.randomUUID(),
             type_: #Accept,
             actor: Config.actor,
             object: incoming->StringOption.wrap,
           },
         )
-        if res.ok && await actor->StringOption.fromString->GitHub.insertToFile("/followers") {
+        if res.ok && (await actor->StringOption.fromString->GitHub.insertToFile("/followers")) {
           {statusCode: 200}
         } else {
           {statusCode: 500, body: "Can't post Accept activity or can't update DB"}
@@ -61,9 +52,9 @@ let unfollow = async incoming =>
     }
   }
 
-let noteBaseLength = (Config.baseURL ++ "/note")->Js.String2.length
+let noteBaseLength = (Config.baseURL ++ "/note")->String.length
 // example.com/note/slug => /slug
-let noteId2Slug = id => id->Js.String2.sliceToEnd(~from=noteBaseLength)
+let noteId2Slug = id => id->String.slice(~start=noteBaseLength)
 
 let slugExist = async slug =>
   try (await fetch(Config.baseURL ++ slug, {"method": #HEAD})).ok catch {
@@ -77,7 +68,7 @@ let nonTextReaction = async (~pathPrefix, ~undo, incoming) =>
       let forMe = await slug->slugExist
       let path = pathPrefix ++ slug
       let update = undo ? GitHub.removeFromFile : GitHub.insertToFile
-      if !forMe || await actor->StringOption.fromString->update(path) {
+      if !forMe || (await actor->StringOption.fromString->update(path)) {
         {statusCode: 200}
       } else {
         {statusCode: 500, body: "Can't update DB"}
@@ -87,9 +78,9 @@ let nonTextReaction = async (~pathPrefix, ~undo, incoming) =>
   | _ => {statusCode: 400, body: "I need both actor and object"}
   }
 
-let like = nonTextReaction(~pathPrefix="/likes")
+let like = nonTextReaction(~pathPrefix="/likes", ...)
 
-let announce = nonTextReaction(~pathPrefix="/announces")
+let announce = nonTextReaction(~pathPrefix="/announces", ...)
 
 let create = async incoming =>
   switch incoming.object {
@@ -100,7 +91,7 @@ let create = async incoming =>
         let slug = inReplyTo->noteId2Slug
         let forMe = await slug->slugExist
         let path = "/replies" ++ slug
-        if !forMe || await obj->StringOption.wrap->GitHub.insertToFile(path) {
+        if !forMe || (await obj->StringOption.wrap->GitHub.insertToFile(path)) {
           {statusCode: 200}
         } else {
           {statusCode: 500, body: "Can't update DB"}
@@ -118,7 +109,7 @@ let delete = async incoming =>
       let slug = object->getId->noteId2Slug
       let forMe = await slug->slugExist
       let path = "/replies" ++ slug // Assumption: the only thing can be deleted is a reply
-      if !forMe || await object->GitHub.removeFromFile(path) {
+      if !forMe || (await object->GitHub.removeFromFile(path)) {
         {statusCode: 200}
       } else {
         {statusCode: 500, body: "Can't update DB"}

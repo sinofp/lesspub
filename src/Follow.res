@@ -1,15 +1,13 @@
-open Object
-open Js.Promise2
+open APObject
+open! Promise // shadows ignore
 open Fetch
-
-@module("node:crypto") external randomUUID: unit => string = "randomUUID"
 
 // Note: this function is only for testing if my message will be accepted.
 // After all, what's the point to follow someone as a static blog?
 let main = async () => {
   let actors = ["https://dvd.chat/users/9gt1gfwbnibzwcur"]
-  let inboxes = await actors->Js.Array2.map(x => x->fetchInbox)->all
-  let pairs = Array.zip(actors, inboxes)->Array.keepMap(((a, opt)) =>
+  let inboxes = await actors->Array.map(x => x->fetchInbox)->all
+  let pairs = Array.zip(actors, inboxes)->Array.filterMap(((a, opt)) =>
     switch (a, opt) {
     | (_, None) => None
     | (_, Some(b)) => (a, b)->Some
@@ -17,15 +15,15 @@ let main = async () => {
   )
 
   await pairs
-  ->Js.Array2.map(((actor, inbox)) => {
-    Js.log2("Sending to", inbox)
+  ->Array.map(((actor, inbox)) => {
+    Console.log2("Sending to", inbox)
 
-    let url = Handle.URL.make(inbox)
+    let url = Node.URL.make(inbox)
     Egress.post(
       url.host,
       url.pathname,
       {
-        id: Config.actor ++ "/follow/" ++ randomUUID(),
+        id: Config.actor ++ "/follow/" ++ Node.Crypto.randomUUID(),
         type_: #Follow,
         actor: Config.actor,
         object: actor->StringOption.fromString,
@@ -37,7 +35,7 @@ let main = async () => {
 
 main()
 ->then(res => {
-  Js.log(res)
+  Console.log(res)
   resolve()
 })
 ->ignore

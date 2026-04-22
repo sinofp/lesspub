@@ -1,26 +1,25 @@
 type response = {ok: bool}
 @val external fetch: (string, 'a) => promise<response> = "fetch"
 @send external text: response => promise<string> = "text"
-@send external json: response => promise<Js.Dict.t<Js.Json.t>> = "json"
+@send external json: response => promise<dict<JSON.t>> = "json"
 
 let headers = {"accept": "application/activity+json"}
 
 let fetchKey = async keyId => {
   let res = await fetch(keyId, {"headers": headers})
-  try (await res
-  ->json)
-  ->Js.Dict.get("publicKey")
-  ->Option.flatMap(Js.Json.decodeObject)
-  ->Option.flatMap(x => x->Js.Dict.get("publicKeyPem"))
-  ->Option.flatMap(Js.Json.decodeString) catch {
-  | Js.Exn.Error(_) => None // Doesn't return a json
+  try (await res->json)
+  ->Dict.get("publicKey")
+  ->Option.flatMap(JSON.Decode.object)
+  ->Option.flatMap(x => x->Dict.get("publicKeyPem"))
+  ->Option.flatMap(JSON.Decode.string) catch {
+  | JsExn(_) => None // Doesn't return a json
   }
 }
 
 let fetchInbox = async actor => {
   let res = await fetch(actor, {"headers": headers})
-  try (await res->json)->Js.Dict.get("inbox")->Option.flatMap(Js.Json.decodeString) catch {
-  | Js.Exn.Error(_) => None
+  try (await res->json)->Dict.get("inbox")->Option.flatMap(JSON.Decode.string) catch {
+  | JsExn(_) => None
   }
 }
 
@@ -51,7 +50,7 @@ module GitHub = {
             "sha": sha, // Only needed for updating
           }
           ->Obj.magic
-          ->Js.Json.stringify,
+          ->JSON.stringify,
         },
       )
     ).ok
@@ -69,42 +68,42 @@ module GitHub = {
             "sha": sha,
           }
           ->Obj.magic
-          ->Js.Json.stringify,
+          ->JSON.stringify,
         },
       )
     ).ok
 
+  open APObject
   let get = async path => {
     let res = await fetch(ghBaseURL ++ path, {"headers": headers})
     if res.ok {
       let dict = await res->json
-      let content =
-        dict->Js.Dict.get("content")->Option.flatMap(Js.Json.decodeString)->Option.map(btoa)
-      let sha = dict->Js.Dict.get("sha")->Option.flatMap(Js.Json.decodeString)
+      let content = dict->Dict.get("content")->Option.flatMap(JSON.Decode.string)->Option.map(btoa)
+      let sha = dict->Dict.get("sha")->Option.flatMap(JSON.Decode.string)
       (content, sha)
     } else {
       (None, None)
     }
   }
 
-  open Object
   let insertToFile = async (ooi, path) => {
     let (collection, sha) = await path->get
     let collection =
       collection
       ->Option.flatMap(x => x->fromString->resultToOption)
-      ->Option.getWithDefault({
+      ->Option.getOr({
         id: baseURL ++ path,
         type_: #OrderedCollection,
         totalItems: 0,
         orderedItems: [],
       })
 
-    let {totalItems, orderedItems} = collection
-    orderedItems->Js.Array2.includes(ooi) || {
+    let totalItems = collection.totalItems->Option.getOr(0)
+    let orderedItems = collection.orderedItems->Option.getOr([])
+    orderedItems->Array.some(x => x == ooi) || {
         collection.totalItems = Some(1 + totalItems)
-        collection.orderedItems = Some([ooi]->Js.Array2.concat(orderedItems))
-        await collection->toJSON->Js.Json.stringify->put(path, sha)
+        collection.orderedItems = Some([ooi]->Array.concat(orderedItems))
+        await collection->toJSON->JSON.stringify->put(path, sha)
       }
   }
 
@@ -113,17 +112,17 @@ module GitHub = {
     switch collection->Option.flatMap(x => x->fromString->resultToOption) {
     | None => true
     | Some(collection) => {
-        let {totalItems, orderedItems} = collection
+        let totalItems = collection.totalItems->Option.getOr(0)
+        let orderedItems = collection.orderedItems->Option.getOr([])
         let id = ooi->getId
-        Js.log3(totalItems, sha, id)
-        switch (totalItems, orderedItems->Js.Array2.findIndex(x => id == x->getId)) {
-        | (_, -1) => true
-        | (1, _) => await delete(path, sha->Option.getExn)
-        | (_, i) => {
-            let _ = orderedItems->Js.Array2.removeCountInPlace(~pos=i, ~count=1)
+        Console.log3(totalItems, sha, id)
+        switch (totalItems, orderedItems->Array.findIndexOpt(x => id == x->getId)) {
+        | (_, None) => true
+        | (1, Some(_)) => await delete(path, sha->Option.getOrThrow)
+        | (_, Some(i)) => {
             collection.totalItems = Some(totalItems - 1)
-            collection.orderedItems = Some(orderedItems)
-            await collection->toJSON->Js.Json.stringify->put(path, sha)
+            collection.orderedItems = Some(orderedItems->Array.filterWithIndex((_, j) => j != i))
+            await collection->toJSON->JSON.stringify->put(path, sha)
           }
         }
       }

@@ -2,9 +2,9 @@ type httpMethod = [#POST | #GET | #PUT | #DELETE | #HEAD]
 
 type event = {
   path: string,
-  queryStringParameters: Js.Dict.t<string>,
+  queryStringParameters: dict<string>,
   httpMethod: httpMethod,
-  headers: Js.Dict.t<string>,
+  headers: dict<string>,
   body: option<string>,
   isBase64Encoded: bool,
   netlifyGraphToken: option<string>,
@@ -12,6 +12,6 @@ type event = {
 
 type response = {
   statusCode: int,
-  headers?: Js.Dict.t<string>,
+  headers?: dict<string>,
   body?: string,
 }

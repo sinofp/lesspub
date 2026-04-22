@@ -3,14 +3,14 @@ module StringOption = {
   type option<'a> = String(string) | Wrap('a)
 
   external fromString: string => t<'a> = "%identity"
-  external fromJSObject: Js.Types.obj_val => t<'a> = "%identity"
+  external fromJSObject: Type.Classify.object => t<'a> = "%identity"
   external wrap: 'a => t<'a> = "%identity"
   external unwrap: t<'a> => 'a = "%identity"
 
   let classify = (t: t<'a>) =>
-    switch Js.Types.classify(t) {
-    | JSString(string) => String(string)
-    | JSObject(obj_val) => Wrap(obj_val->fromJSObject->unwrap)
+    switch Type.Classify.classify(t) {
+    | Type.Classify.String(string) => String(string)
+    | Type.Classify.Object(obj_val) => Wrap(obj_val->fromJSObject->unwrap)
     | _ => failwith("Unreachable code")
     }
 }
@@ -50,27 +50,22 @@ let getId = ooi =>
   }
 
 let toJSON = (o: t) => {
-  open Js.Dict
-  open Js.Json
-  let dict: Js.Dict.t<Js.Json.t> = o->Obj.magic
+  open Dict
+  open JSON
+  let dict: dict<JSON.t> = o->Obj.magic
   switch dict->get("@context") {
-  | Some(_) => () // Object created by Object.t doesn't have the top level @context
-  | None => dict->set("@context", "https://www.w3.org/ns/activitystreams"->string)
+  | Some(_) => () // Object created by APObject.t doesn't have the top level @context
+  | None => dict->set("@context", "https://www.w3.org/ns/activitystreams"->Encode.string)
   }
-  dict->object_
+  dict->Encode.object
 }
 
-let isJSONString = json =>
-  switch Js.Json.classify(json) {
-  | Js.Json.JSONString(_) => true
-  | _ => false
-  }
+let isJSONString = json => JSON.Decode.string(json)->Option.isSome
 
 let rec validateJSON = json => {
-  switch Js.Json.classify(json) {
-  | Js.Json.JSONObject(dict) => {
-      open Js.Dict
-      open Js.Json
+  switch JSON.Decode.object(json) {
+  | Some(dict) => {
+      open Dict
       open! Option
       let id = dict->get("id")->map(isJSONString)
       let type_ = dict->get("type")->map(isJSONString)
@@ -78,20 +73,20 @@ let rec validateJSON = json => {
       let orderedItems =
         dict
         ->get("orderedItems")
-        ->flatMap(decodeArray)
-        ->map(Js.Array.every(x => x->isJSONString || x->validateJSON))
+        ->flatMap(JSON.Decode.array)
+        ->map(items => items->Array.every(x => x->isJSONString || x->validateJSON))
       switch (id, type_, obj, orderedItems) {
       | (Some(true), Some(true), None | Some(true), None | Some(true)) => true
       | _ => false
       }
     }
 
-  | _ => false
+  | None => false
   }
 }
 
 let fromString = s =>
-  try Ok(s->Js.Json.parseExn) catch {
+  try Ok(s->JSON.parseOrThrow) catch {
   | _ => Error("Error parsing JSON string")
   }->Result.flatMap(x =>
     if x->validateJSON {
@@ -101,4 +96,4 @@ let fromString = s =>
     }
   )
 
-let resultToOption = r => r->Result.mapWithDefault(None, x => Some(x))
+let resultToOption = r => r->Result.mapOr(None, x => Some(x))

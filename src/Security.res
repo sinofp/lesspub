@@ -1,22 +1,18 @@
-module Hash = {
-  type t
-  @module("node:crypto") external create: string => t = "createHash"
-  @send external update: (t, string) => t = "update"
-  @send external digest: (t, string) => string = "digest"
-  let get = text => create("sha256")->update(text)->digest("base64")
-}
+@send external joinWith: (array<string>, string) => string = "join"
 
 open Node
 
-@module("node:crypto")
-external sign': (string, Buffer.t, string) => Buffer.t = "sign"
-let sign = data =>
-  "sha256"->sign'(data->Buffer.fromString, Config.privateKey)->Buffer.toStringWithEncoding(#base64)
+module Hash = {
+  let get = text => Crypto.createHash("sha256")->Crypto.update(text)->Crypto.digest("base64")
+}
 
-@module("node:crypto")
-external verify': (string, Buffer.t, string, Buffer.t) => bool = "verify"
+let sign = data =>
+  "sha256"
+  ->Crypto.sign(data->Buffer.fromString, Config.privateKey)
+  ->Buffer.toStringWithEncoding(#base64)
+
 let verify = (data, publicKey, signature) =>
-  verify'(
+  Crypto.verify(
     "sha256",
     data->Buffer.fromString,
     publicKey,
@@ -29,51 +25,51 @@ module Signature = {
   // Only use this function for POST because it requires body & digest
   let verifyDigest = (event: event) =>
     event.headers
-    ->Js.Dict.get("digest")
-    ->Option.mapWithDefault(false, x =>
-      x == "SHA-256=" ++ Hash.get(event.body->Option.getWithDefault(""))
-    )
+    ->Dict.get("digest")
+    ->Option.mapOr(false, x => x == "SHA-256=" ++ Hash.get(event.body->Option.getOr("")))
 
   let verifySignature = async (event: event, keyId, headers: array<string>, signature) =>
-    (await Fetch.fetchKey(keyId))->Option.mapWithDefault(false, publicKey => {
+    (await Fetch.fetchKey(keyId))->Option.mapOr(false, publicKey => {
       let to_be_signed =
         headers
-        ->Js.Array2.map(h =>
-          switch (h, event.headers->Js.Dict.get(h)) {
+        ->Array.map(h =>
+          switch (h, event.headers->Dict.get(h)) {
           | ("(request-target)", _) =>
-            `(request-target): ${(event.httpMethod :> string)->Js.String2.toLowerCase} ${event.path}`
+            `(request-target): ${(event.httpMethod :> string)->String.toLowerCase} ${event.path}`
           | (_, Some(v)) => h ++ ": " ++ v
+          | (_, None) => h ++ ": "
           }
         )
-        ->Js.Array2.joinWith("\n")
+        ->joinWith("\n")
       verify(to_be_signed, publicKey, signature)
     })
 
   let parse = headers =>
     headers
-    ->Js.Dict.get("signature")
+    ->Dict.get("signature")
     ->Option.map(s => {
-      open Js.String2
-      open! Js.Dict // Shadows get
       let dict =
         s
-        ->split(",")
-        ->Js.Array2.map(x => {
-          let i = x->indexOf("=")
-          (x->slice(~from=0, ~to_=i), x->slice(~from=i + 2, ~to_=x->length - 1))
+        ->String.split(",")
+        ->Array.map(x => {
+          let i = x->String.indexOf("=")
+          (
+            x->String.slice(~start=0, ~end=i),
+            x->String.slice(~start=i + 2, ~end=x->String.length - 1),
+          )
         })
-        ->fromArray
-      let keyId = dict->get("keyId")
-      let signature = dict->get("signature")
-      let algorithm = dict->get("algorithm")
-      let headers = dict->get("headers")->Option.map(s => s->split(" "))
+        ->Dict.fromArray
+      let keyId = dict->Dict.get("keyId")
+      let signature = dict->Dict.get("signature")
+      let algorithm = dict->Dict.get("algorithm")
+      let headers = dict->Dict.get("headers")->Option.map(s => s->String.split(" "))
       (keyId, signature, algorithm, headers)
     })
 
   let verify = async (event: event) =>
     switch event.headers->parse {
     | Some(Some(keyId), Some(signature), Some(_), Some(headers)) =>
-      event->verifyDigest && await event->verifySignature(keyId, headers, signature)
+      event->verifyDigest && (await event->verifySignature(keyId, headers, signature))
     | _ => false
     }
 }

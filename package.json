@@ -4,8 +4,8 @@
   "scripts": {
     "res:build": "rescript",
     "res:clean": "rescript clean",
-    "res:dev": "rescript build -w",
-    "res:fmt": "rescript format -all",
+    "res:dev": "rescript watch",
+    "res:fmt": "rescript format",
     "build:bundle": "npm run res:build && esbuild src/Send.js --bundle --platform=node --outfile=dist/Send.js"
   },
   "devDependencies": {
@@ -14,6 +14,6 @@
   "author": "sinofp",
   "license": "BSD-2-Clause",
   "dependencies": {
-    "rescript": "^10.1.2"
+    "rescript": "^12.2.0"
   }
 }
