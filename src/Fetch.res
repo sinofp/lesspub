@@ -103,7 +103,7 @@ module GitHub = {
     orderedItems->Array.some(x => x == ooi) || {
         collection.totalItems = Some(1 + totalItems)
         collection.orderedItems = Some([ooi]->Array.concat(orderedItems))
-        await collection->toJSON->JSON.stringify->put(path, sha)
+        await collection->toJSON->JSON.stringify(~space=4)->put(path, sha)
       }
   }
 
@@ -122,7 +122,7 @@ module GitHub = {
         | (_, Some(i)) => {
             collection.totalItems = Some(totalItems - 1)
             collection.orderedItems = Some(orderedItems->Array.filterWithIndex((_, j) => j != i))
-            await collection->toJSON->JSON.stringify->put(path, sha)
+            await collection->toJSON->JSON.stringify(~space=4)->put(path, sha)
           }
         }
       }

@@ -123,7 +123,7 @@ async function insertToFile(ooi, path) {
   } else {
     collection.totalItems = 1 + totalItems | 0;
     collection.orderedItems = [ooi].concat(orderedItems);
-    return await put(JSON.stringify(APObject.toJSON(collection)), path, match[1]);
+    return await put(JSON.stringify(APObject.toJSON(collection), undefined, 4), path, match[1]);
   }
 }
 
@@ -144,7 +144,7 @@ async function removeFromFile(ooi, path) {
     if (totalItems !== 1) {
       collection$1.totalItems = totalItems - 1 | 0;
       collection$1.orderedItems = orderedItems.filter((param, j) => j !== match$1);
-      return await put(JSON.stringify(APObject.toJSON(collection$1)), path, sha);
+      return await put(JSON.stringify(APObject.toJSON(collection$1), undefined, 4), path, sha);
     } else {
       return await $$delete(path, Stdlib_Option.getOrThrow(sha, undefined));
     }
