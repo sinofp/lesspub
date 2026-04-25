@@ -43,8 +43,7 @@ let main = async () => {
   await inboxes
   ->Array.map(x => {
     Console.log2("Sending to", x)
-    let {host, pathname} = x->Node.URL.make
-    Egress.post(host, pathname, last_create_note)
+    Egress.post(x, last_create_note)
   })
   ->Promise.all
 }

@@ -1,0 +1,10 @@
+{
+    "@context": "https://www.w3.org/ns/activitystreams",
+    "id": "http://localhost:9999/users/alvis/statuses/reply/1/delete",
+    "type": "Delete",
+    "actor": "http://localhost:9999/users/alvis",
+    "object": {
+        "id": "http://localhost:9999/users/alvis/statuses/reply/1",
+        "type": "Tombstone"
+    }
+}

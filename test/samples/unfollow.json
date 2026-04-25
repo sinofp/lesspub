@@ -1,0 +1,12 @@
+{
+    "@context": "https://www.w3.org/ns/activitystreams",
+    "id": "http://localhost:9999/follow/1/undo",
+    "type": "Undo",
+    "actor": "http://localhost:9999/users/alvis",
+    "object": {
+        "id": "http://localhost:9999/follow/1",
+        "type": "Follow",
+        "actor": "http://localhost:9999/users/alvis",
+        "object": "http://localhost:8888/actor"
+    }
+}

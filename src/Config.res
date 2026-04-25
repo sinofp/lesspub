@@ -1,4 +1,5 @@
 open Dict
+open Node.Global
 
 let env = Node.Process.env
 
@@ -12,4 +13,9 @@ let extraInboxes =
 let actor = baseURL ++ "/actor"
 let keyId = actor ++ "#main-key"
 
-@module external actorJSON: JSON.t = "../../../../actor.json"
+let actorJSON =
+  env
+  ->get("AP_ACTOR_JSON_PATH")
+  ->Option.getOr(Node.Path.join([__dirname, "../../../../actor.json"]))
+  ->Node.Fs.readFileAsUtf8Sync
+  ->JSON.parseOrThrow

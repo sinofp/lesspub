@@ -4,7 +4,6 @@
 let Fetch = require("./Fetch.js");
 let Config = require("./Config.js");
 let Egress = require("./Egress.js");
-let Nodeurl = require("node:url");
 let Nodecrypto = require("node:crypto");
 let Stdlib_Array = require("@rescript/runtime/lib/js/Stdlib_Array.js");
 let Primitive_option = require("@rescript/runtime/lib/js/Primitive_option.js");
@@ -24,8 +23,7 @@ async function main() {
   return await Promise.all(pairs.map(param => {
     let inbox = param[1];
     console.log("Sending to", inbox);
-    let url = new Nodeurl.URL(inbox);
-    return Egress.post(url.host, url.pathname, {
+    return Egress.post(inbox, {
       id: Config.actor + "/follow/" + Nodecrypto.randomUUID(),
       type: "Follow",
       actor: Config.actor,

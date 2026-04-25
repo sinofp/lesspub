@@ -20,13 +20,10 @@ let follow = async incoming =>
     switch await fetchInbox(actor) {
     | None => {statusCode: 400, body: "Where's your inbox?"}
     | Some(inbox) => {
-        open Node
-        let url = URL.make(inbox)
         let res = await Egress.post(
-          url.host,
-          url.pathname,
+          inbox,
           {
-            id: Config.actor ++ "/follow/" ++ Crypto.randomUUID(),
+            id: Config.actor ++ "/follow/" ++ Node.Crypto.randomUUID(),
             type_: #Accept,
             actor: Config.actor,
             object: incoming->StringOption.wrap,
@@ -57,7 +54,7 @@ let noteBaseLength = (Config.baseURL ++ "/note")->String.length
 let noteId2Slug = id => id->String.slice(~start=noteBaseLength)
 
 let slugExist = async slug =>
-  try (await fetch(Config.baseURL ++ slug, {"method": #HEAD})).ok catch {
+  try (await Node.Global.fetch(Config.baseURL ++ slug, {"method": #HEAD})).ok catch {
   | _ => false // FetchError: ENOTFOUND
   }
 

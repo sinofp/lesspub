@@ -2,6 +2,8 @@
 'use strict';
 
 
+let Global = {};
+
 let Buffer = {};
 
 let Crypto = {};
@@ -14,10 +16,20 @@ let Process = {};
 
 let URL = {};
 
+let Http = {};
+
+let Os = {};
+
+let $$Date = {};
+
+exports.Global = Global;
 exports.Buffer = Buffer;
 exports.Crypto = Crypto;
 exports.Fs = Fs;
 exports.Path = Path;
 exports.Process = Process;
 exports.URL = URL;
+exports.Http = Http;
+exports.Os = Os;
+exports.$$Date = $$Date;
 /* No side effect */

@@ -1,7 +1,4 @@
-type response = {ok: bool}
-@val external fetch: (string, 'a) => promise<response> = "fetch"
-@send external text: response => promise<string> = "text"
-@send external json: response => promise<dict<JSON.t>> = "json"
+open Node.Global
 
 let headers = {"accept": "application/activity+json"}
 

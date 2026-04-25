@@ -1,0 +1,10 @@
+{
+    "@context": "https://www.w3.org/ns/activitystreams",
+    "id": "http://localhost:9999/users/alvis/statuses/boost/1/activity",
+    "type": "Announce",
+    "actor": "http://localhost:9999/users/alvis",
+    "published": "2023-08-01T11:31:24Z",
+    "to": ["https://www.w3.org/ns/activitystreams#Public"],
+    "cc": ["http://localhost:8888/actor", "http://localhost:9999/users/alvis/followers"],
+    "object": "http://localhost:8888/note/test-note-1"
+}

@@ -1,8 +1,9 @@
 {
   "name": "lesspub",
-  "sources": {
-    "dir": "src"
-  },
+  "sources": [
+    {"dir": "src"},
+    {"dir": "test"}
+  ],
   "package-specs": {
     "module": "commonjs",
     "in-source": true

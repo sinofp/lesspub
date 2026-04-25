@@ -1,0 +1,14 @@
+{
+    "@context": "https://www.w3.org/ns/activitystreams",
+    "type": "Undo",
+    "id": "http://localhost:9999/users/alvis/statuses/boost/1/undo",
+    "actor": "http://localhost:9999/users/alvis",
+    "object": {
+        "id": "http://localhost:9999/users/alvis/statuses/boost/1/activity",
+        "actor": "http://localhost:9999/users/alvis",
+        "type": "Announce",
+        "to": ["https://www.w3.org/ns/activitystreams#Public"],
+        "cc": ["http://localhost:9999/users/alvis/followers"],
+        "object": "http://localhost:8888/note/test-note-1"
+    }
+}

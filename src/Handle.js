@@ -5,7 +5,6 @@ let Fetch = require("./Fetch.js");
 let Config = require("./Config.js");
 let Egress = require("./Egress.js");
 let APObject = require("./APObject.js");
-let Nodeurl = require("node:url");
 let Nodecrypto = require("node:crypto");
 let Stdlib_Option = require("@rescript/runtime/lib/js/Stdlib_Option.js");
 let Primitive_option = require("@rescript/runtime/lib/js/Primitive_option.js");
@@ -46,8 +45,7 @@ async function follow(incoming) {
       body: "Where's your inbox?"
     };
   }
-  let url = new Nodeurl.URL(inbox);
-  let res = await Egress.post(url.host, url.pathname, {
+  let res = await Egress.post(inbox, {
     id: Config.actor + "/follow/" + Nodecrypto.randomUUID(),
     type: "Accept",
     actor: Config.actor,

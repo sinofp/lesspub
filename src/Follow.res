@@ -18,10 +18,8 @@ let main = async () => {
   ->Array.map(((actor, inbox)) => {
     Console.log2("Sending to", inbox)
 
-    let url = Node.URL.make(inbox)
     Egress.post(
-      url.host,
-      url.pathname,
+      inbox,
       {
         id: Config.actor ++ "/follow/" ++ Node.Crypto.randomUUID(),
         type_: #Follow,

@@ -6,6 +6,7 @@
     "res:clean": "rescript clean",
     "res:dev": "rescript watch",
     "res:fmt": "rescript format",
+    "test": "npm run res:build && node test/Test.js",
     "build": "npm run res:build && esbuild src/Send.js --bundle --platform=node --external:*.json --outfile=dist/Send.js"
   },
   "devDependencies": {

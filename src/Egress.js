@@ -4,12 +4,15 @@
 let Config = require("./Config.js");
 let APObject = require("./APObject.js");
 let Security = require("./Security.js");
+let Nodeurl = require("node:url");
 
-function post(host, path, activity) {
+function post(inbox, activity) {
+  let match = new Nodeurl.URL(inbox);
+  let host = match.host;
   let body = JSON.stringify(APObject.toJSON(activity));
   let date = new Date().toUTCString();
   let digest = "SHA-256=" + Security.Hash.get(body);
-  let to_be_signed = `(request-target): post ` + path + `\nhost: ` + host + `\ndate: ` + date + `\ndigest: ` + digest;
+  let to_be_signed = `(request-target): post ` + match.pathname + `\nhost: ` + host + `\ndate: ` + date + `\ndigest: ` + digest;
   let signature = Security.sign(to_be_signed);
   let fetch_options = {
     method: "POST",
@@ -23,7 +26,7 @@ function post(host, path, activity) {
     }
   };
   console.log("I will send:", fetch_options);
-  return fetch(`https://` + host + path, fetch_options);
+  return fetch(inbox, fetch_options);
 }
 
 exports.post = post;

@@ -6,7 +6,6 @@ let Config = require("./Config.js");
 let Egress = require("./Egress.js");
 let Nodefs = require("node:fs");
 let APObject = require("./APObject.js");
-let Nodeurl = require("node:url");
 let Nodepath = require("node:path");
 let Pervasives = require("@rescript/runtime/lib/js/Pervasives.js");
 let Stdlib_Array = require("@rescript/runtime/lib/js/Stdlib_Array.js");
@@ -52,8 +51,7 @@ async function main() {
   }))), x => x).concat(Config.extraInboxes);
   return await Promise.all(inboxes.map(x => {
     console.log("Sending to", x);
-    let match = new Nodeurl.URL(x);
-    return Egress.post(match.host, match.pathname, last_create_note);
+    return Egress.post(x, last_create_note);
   }));
 }
 
