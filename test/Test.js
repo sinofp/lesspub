@@ -319,8 +319,8 @@ async function runTests(remotePrivateKey, tmpDataDir, waitForAccept) {
     await inboxTest("Undo Like", "unlike.json", "likes/test-note-1", remoteActor, false, undefined),
     await inboxTest("Announce", "announce.json", "announces/test-note-1", remoteActor, true, undefined),
     await inboxTest("Undo Announce", "unannounce.json", "announces/test-note-1", remoteActor, false, undefined),
-    await inboxTest("Create reply", "reply.json", "replies/test-note-1", noteId, true, undefined),
-    await inboxTest("Delete", "delete.json", "replies/test-note-1", noteId, false, undefined)
+    await inboxTest("Create reply", "reply.json", "all-replies", noteId, true, undefined),
+    await inboxTest("Delete", "delete.json", "all-replies", noteId, false, undefined)
   ];
 }
 

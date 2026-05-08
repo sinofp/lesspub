@@ -87,8 +87,7 @@ let create = async incoming =>
     | Wrap({type_: #Note, inReplyTo} as obj) => {
         let slug = inReplyTo->noteId2Slug
         let forMe = await slug->slugExist
-        let path = "/replies" ++ slug
-        if !forMe || (await obj->StringOption.wrap->GitHub.insertToFile(path)) {
+        if !forMe || (await obj->StringOption.wrap->GitHub.insertToFile("/all-replies")) {
           {statusCode: 200}
         } else {
           {statusCode: 500, body: "Can't update DB"}
@@ -102,17 +101,12 @@ let create = async incoming =>
 
 let delete = async incoming =>
   switch incoming.object {
-  | Some(object) => {
-      let slug = object->getId->noteId2Slug
-      let forMe = await slug->slugExist
-      let path = "/replies" ++ slug // Assumption: the only thing can be deleted is a reply
-      if !forMe || (await object->GitHub.removeFromFile(path)) {
-        {statusCode: 200}
-      } else {
-        {statusCode: 500, body: "Can't update DB"}
-      }
+  | Some(object) =>
+    if await object->GitHub.removeFromFile("/all-replies") {
+      {statusCode: 200}
+    } else {
+      {statusCode: 500, body: "Can't update DB"}
     }
-
   | None => {statusCode: 400, body: "I need object"}
   }
 

@@ -345,8 +345,9 @@ var require_Stdlib_Option = __commonJS({
 var require_Config = __commonJS({
   "src/Config.js"(exports2) {
     "use strict";
+    var Nodefs2 = require("node:fs");
+    var Nodepath2 = require("node:path");
     var Stdlib_Option2 = require_Stdlib_Option();
-    var ActorJson = require("../../../../actor.json");
     var env = process.env;
     var baseURL = Stdlib_Option2.getOrThrow(env["AP_BASE_URL"], void 0);
     var privateKey = Stdlib_Option2.getOrThrow(env["AP_PRIVATE_KEY"], void 0).replace(/\\n/g, "\n");
@@ -355,7 +356,7 @@ var require_Config = __commonJS({
     var extraInboxes = Stdlib_Option2.getOr(Stdlib_Option2.map(env["AP_EXTRA_INBOXES"], (s) => s.split(",")), []);
     var actor = baseURL + "/actor";
     var keyId = actor + "#main-key";
-    var actorJSON = ActorJson;
+    var actorJSON = JSON.parse(Nodefs2.readFileSync(Stdlib_Option2.getOr(env["AP_ACTOR_JSON_PATH"], Nodepath2.join(__dirname, "../../../../actor.json")), "utf8"));
     exports2.env = env;
     exports2.baseURL = baseURL;
     exports2.privateKey = privateKey;
@@ -2127,7 +2128,7 @@ var require_Fetch = __commonJS({
       } else {
         collection.totalItems = 1 + totalItems | 0;
         collection.orderedItems = [ooi].concat(orderedItems);
-        return await put(JSON.stringify(APObject2.toJSON(collection)), path, match[1]);
+        return await put(JSON.stringify(APObject2.toJSON(collection), void 0, 4), path, match[1]);
       }
     }
     async function removeFromFile(ooi, path) {
@@ -2147,7 +2148,7 @@ var require_Fetch = __commonJS({
         if (totalItems !== 1) {
           collection$1.totalItems = totalItems - 1 | 0;
           collection$1.orderedItems = orderedItems.filter((param, j) => j !== match$1);
-          return await put(JSON.stringify(APObject2.toJSON(collection$1)), path, sha);
+          return await put(JSON.stringify(APObject2.toJSON(collection$1), void 0, 4), path, sha);
         } else {
           return await $$delete(path, Stdlib_Option2.getOrThrow(sha, void 0));
         }
@@ -2274,11 +2275,14 @@ var require_Egress = __commonJS({
     var Config2 = require_Config();
     var APObject2 = require_APObject();
     var Security = require_Security();
-    function post(host, path, activity) {
+    var Nodeurl = require("node:url");
+    function post(inbox, activity) {
+      let match = new Nodeurl.URL(inbox);
+      let host = match.host;
       let body = JSON.stringify(APObject2.toJSON(activity));
       let date = (/* @__PURE__ */ new Date()).toUTCString();
       let digest = "SHA-256=" + Security.Hash.get(body);
-      let to_be_signed = `(request-target): post ` + path + `
+      let to_be_signed = `(request-target): post ` + match.pathname + `
 host: ` + host + `
 date: ` + date + `
 digest: ` + digest;
@@ -2295,7 +2299,7 @@ digest: ` + digest;
         }
       };
       console.log("I will send:", fetch_options);
-      return fetch(`https://` + host + path, fetch_options);
+      return fetch(inbox, fetch_options);
     }
     exports2.post = post;
   }
@@ -2319,7 +2323,6 @@ var Config = require_Config();
 var Egress = require_Egress();
 var Nodefs = require("node:fs");
 var APObject = require_APObject();
-var Nodeurl = require("node:url");
 var Nodepath = require("node:path");
 var Pervasives = require_Pervasives();
 var Stdlib_Array = require_Stdlib_Array();
@@ -2364,8 +2367,7 @@ async function main() {
   }))), (x) => x).concat(Config.extraInboxes);
   return await Promise.all(inboxes.map((x) => {
     console.log("Sending to", x);
-    let match = new Nodeurl.URL(x);
-    return Egress.post(match.host, match.pathname, last_create_note);
+    return Egress.post(x, last_create_note);
   }));
 }
 main().then((res) => {

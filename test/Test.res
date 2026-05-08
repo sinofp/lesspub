@@ -340,10 +340,8 @@ let runTests = async (
       remoteActor,
       false,
     ),
-    await inboxTest("Create reply", "reply.json", "replies/test-note-1", noteId, true),
-    // Known bug: noteId2Slug strips the local base URL prefix; a remote Tombstone id doesn't
-    // match, so the wrong collection path is computed and the reply is never removed.
-    await inboxTest("Delete", "delete.json", "replies/test-note-1", noteId, false),
+    await inboxTest("Create reply", "reply.json", "all-replies", noteId, true),
+    await inboxTest("Delete", "delete.json", "all-replies", noteId, false),
   ]
 }
 

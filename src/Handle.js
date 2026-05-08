@@ -170,8 +170,7 @@ async function create(incoming) {
   }
   let slug = inReplyTo.slice(noteBaseLength);
   let forMe = await slugExist(slug);
-  let path = "/replies" + slug;
-  if (!forMe || await Fetch.GitHub.insertToFile(obj$1, path)) {
+  if (!forMe || await Fetch.GitHub.insertToFile(obj$1, "/all-replies")) {
     return {
       statusCode: 200
     };
@@ -185,24 +184,21 @@ async function create(incoming) {
 
 async function $$delete(incoming) {
   let object = incoming.object;
-  if (object === undefined) {
+  if (object !== undefined) {
+    if (await Fetch.GitHub.removeFromFile(Primitive_option.valFromOption(object), "/all-replies")) {
+      return {
+        statusCode: 200
+      };
+    } else {
+      return {
+        statusCode: 500,
+        body: "Can't update DB"
+      };
+    }
+  } else {
     return {
       statusCode: 400,
       body: "I need object"
-    };
-  }
-  let object$1 = Primitive_option.valFromOption(object);
-  let slug = APObject.getId(object$1).slice(noteBaseLength);
-  let forMe = await slugExist(slug);
-  let path = "/replies" + slug;
-  if (!forMe || await Fetch.GitHub.removeFromFile(object$1, path)) {
-    return {
-      statusCode: 200
-    };
-  } else {
-    return {
-      statusCode: 500,
-      body: "Can't update DB"
     };
   }
 }
