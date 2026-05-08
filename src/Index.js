@@ -14,16 +14,6 @@ async function handler(event, param) {
     path: path,
     headers: event.headers
   });
-  let post_verified = httpMethod === "POST" && await Security.Signature.verify(event);
-  console.log("post_verified:", post_verified);
-  let activity = Stdlib_Option.map(event.body, APObject.fromString);
-  Stdlib_Option.forEach(activity, x => {
-    if (x.TAG === "Ok") {
-      console.log("body:", x._0);
-      return;
-    }
-    console.log("Can't parse body as an ActivityStream Object:", x._0);
-  });
   let handlers = t => {
     if (t === "Accept" || t === "Note" || t === "OrderedCollection") {
       return param => Promise.resolve({
@@ -58,14 +48,24 @@ async function handler(event, param) {
       statusCode: 501
     };
   }
-  if (!post_verified) {
-    return {
-      statusCode: 401
-    };
-  }
   if (path !== "/inbox") {
     return {
       statusCode: 501
+    };
+  }
+  let post_verified = await Security.Signature.verify(event);
+  console.log("post_verified:", post_verified);
+  let activity = Stdlib_Option.map(event.body, APObject.fromString);
+  Stdlib_Option.forEach(activity, x => {
+    if (x.TAG === "Ok") {
+      console.log("body:", x._0);
+      return;
+    }
+    console.log("Can't parse body as an ActivityStream Object:", x._0);
+  });
+  if (!post_verified) {
+    return {
+      statusCode: 401
     };
   }
   if (activity === undefined) {

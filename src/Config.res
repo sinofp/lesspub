@@ -12,11 +12,9 @@ let extraInboxes =
 let actor = baseURL ++ "/actor"
 let keyId = actor ++ "#main-key"
 
-let actorJSON: JSON.t = (
-  %raw(`function(path) {
+let actorJSON: JSON.t = %raw(`function(path) {
     if (path !== undefined) {
       return JSON.parse(require('node:fs').readFileSync(path, 'utf8'));
     }
     return require("../../../../actor.json");
-  }`)
-)(env->get("AP_ACTOR_JSON_PATH"))
+  }`)(env->get("AP_ACTOR_JSON_PATH"))

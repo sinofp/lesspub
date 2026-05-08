@@ -11,17 +11,6 @@ let handler = async (event, _): response => {
     "path": path,
     "headers": headers,
   })
-  let post_verified = httpMethod == #POST && (await verify(event))
-  Console.log2("post_verified:", post_verified)
-
-  let activity = event.body->Option.map(fromString)
-  activity->Option.forEach(x =>
-    switch x {
-    | Ok(obj) => Console.log2("body:", obj)
-    | Error(msg) => Console.log2("Can't parse body as an ActivityStream Object:", msg)
-    }
-  )
-
   let handlers = t =>
     switch t {
     | #Follow => follow
@@ -34,10 +23,24 @@ let handler = async (event, _): response => {
       _ => Promise.resolve({statusCode: 400, body: "Why are you sending this to me?"})
     }
 
-  switch (httpMethod, path, post_verified, activity) {
-  | (#GET, "/actor", _, _) => actor(event)
-  | (#POST, _, false, _) => {statusCode: 401}
-  | (#POST, "/inbox", _, Some(Ok(_ as act))) => await (act.type_->handlers)(act)
+  switch (httpMethod, path) {
+  | (#GET, "/actor") => actor(event)
+  | (#POST, "/inbox") => {
+      let post_verified = await verify(event)
+      Console.log2("post_verified:", post_verified)
+      let activity = event.body->Option.map(fromString)
+      activity->Option.forEach(x =>
+        switch x {
+        | Ok(obj) => Console.log2("body:", obj)
+        | Error(msg) => Console.log2("Can't parse body as an ActivityStream Object:", msg)
+        }
+      )
+      switch (post_verified, activity) {
+      | (false, _) => {statusCode: 401}
+      | (_, Some(Ok(_ as act))) => await (act.type_->handlers)(act)
+      | _ => {statusCode: 501}
+      }
+    }
   | _ => {statusCode: 501}
   }
 }
