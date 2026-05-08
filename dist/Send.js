@@ -345,8 +345,6 @@ var require_Stdlib_Option = __commonJS({
 var require_Config = __commonJS({
   "src/Config.js"(exports2) {
     "use strict";
-    var Nodefs2 = require("node:fs");
-    var Nodepath2 = require("node:path");
     var Stdlib_Option2 = require_Stdlib_Option();
     var env = process.env;
     var baseURL = Stdlib_Option2.getOrThrow(env["AP_BASE_URL"], void 0);
@@ -356,7 +354,12 @@ var require_Config = __commonJS({
     var extraInboxes = Stdlib_Option2.getOr(Stdlib_Option2.map(env["AP_EXTRA_INBOXES"], (s) => s.split(",")), []);
     var actor = baseURL + "/actor";
     var keyId = actor + "#main-key";
-    var actorJSON = JSON.parse(Nodefs2.readFileSync(Stdlib_Option2.getOr(env["AP_ACTOR_JSON_PATH"], Nodepath2.join(__dirname, "../../../../actor.json")), "utf8"));
+    var actorJSON = function(path) {
+      if (path !== void 0) {
+        return JSON.parse(require("node:fs").readFileSync(path, "utf8"));
+      }
+      return require("../../../../actor.json");
+    }(env["AP_ACTOR_JSON_PATH"]);
     exports2.env = env;
     exports2.baseURL = baseURL;
     exports2.privateKey = privateKey;
